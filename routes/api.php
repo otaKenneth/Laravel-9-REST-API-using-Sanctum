@@ -32,10 +32,5 @@ Route::controller(RegisterController::class)->group(function(){
      
 Route::middleware('auth:sanctum')->group( function () {
     Route::resource('users', UsersController::class);
-    Route::resource('products', ProductController::class);
     Route::resource('transactions', TransactionController::class);
-    Route::resource('stores', StoreController::class);
-    // Route::resource('trees', TreeController::class);
-    Route::get('/trees', [TreeController::class, 'index']);
-    Route::get('/trees/{lead}', [TreeController::class, 'show']);
 });
