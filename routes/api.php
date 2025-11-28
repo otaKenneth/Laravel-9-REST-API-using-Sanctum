@@ -6,9 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\API\RegisterController;
-use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\TransactionController;
-use App\Http\Controllers\API\TreeController;
+use App\Http\Controllers\API\DepositController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,8 +28,19 @@ Route::controller(RegisterController::class)->group(function(){
     Route::post('register', 'register');
     Route::post('login', 'login');
 });
-     
+
 Route::middleware('auth:sanctum')->group( function () {
-    Route::resource('users', UsersController::class);
-    Route::resource('transactions', TransactionController::class);
+    Route::middleware('role:admin')->group( function () {
+        Route::resource('users', UsersController::class);
+        Route::post('deposit', [DepositController::class, 'store']);
+        Route::post('withdraw', [TransactionController::class, 'withdraw']);
+        Route::post('transfer', [TransactionController::class, 'transfer']);
+        Route::post('app/register', [AppsController::class, 'registerApp']);
+        Route::get('app/{app}/key', [AppsController::class, 'getAppKey']);
+    });
+
+    Route::middleware('role:customer')->group( function () {
+        Route::resource('transactions', TransactionController::class);
+    });
+
 });

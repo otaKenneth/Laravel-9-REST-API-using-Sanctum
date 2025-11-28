@@ -43,45 +43,14 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function userDetail()
+    public function account() 
     {
-        return $this->hasOne(UserDetails::class);
-    }
-
-    public function myTeam()
-    {
-        return $this->hasOne(Teams::class, 'user_id', 'id');
-    }
-
-    public function precedingTeamLead()
-    {
-        return $this->myTeam->leads()->first() ? $this->myTeam->leads()->first()->precedingTeamLead()->merge([$this->myTeam->leads()->first()]):collect();
-    }
-
-    public function role()
-    {
-        return $this->belongsTo(Roles::class, 'roles_id', 'id');
-    }
-
-    public function stores()
-    {
-        return $this->hasMany(Stores::class);
+        return $this->hasOne(Account::class);
     }
 
     public function transactions()
     {
         return $this->hasMany(Transactions::class);
-    }
-
-    public function team()
-    {
-        return $this->belongsToMany(Teams::class, 'team_user', 'team_id')
-                ->withPivot('lead_id');
-    }
-
-    public function ledTeams()
-    {
-        return $this->hasMany(Teams::class);
     }
 
 }

@@ -11,7 +11,11 @@ class Transactions extends Model
 
     protected $table = 'transactions';
     protected $fillable = [
-        'user_id'
+        'user_id',
+        'account_id',
+        'amount',
+        'transaction_type',
+        'description'
     ];
 
     public $timestamps = true;

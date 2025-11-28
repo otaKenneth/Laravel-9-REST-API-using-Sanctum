@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\API\BaseController as BaseController;
 use App\Models\Transactions;
 use App\Models\User;
+use App\Models\Account;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -71,5 +72,74 @@ class TransactionController extends BaseController
         });
 
         return $this->sendResponse($transaction, "Successfully created a transaction.");
+    }
+
+    public function withdraw(Request $request)
+    {
+        $this->validate($request, [
+            'amount' => 'required|numeric|min:0.01',
+            'account_id' => 'required|exists:accounts,id',
+        ]);
+
+        try {
+            DB::beginTransaction();
+            $account = Account::find($request->account_id);
+            $account->balance -= $request->amount;
+            $account->save();
+    
+            $transaction = new Transactions;
+            $transaction_arr = [
+                'transaction_type' => 'withdraw',
+                'amount' => $request->amount,
+                'account_id' => $request->account_id,
+                'user_id' => auth()->id(),
+                'description' => $request->description ?? 'Withdraw transaction',
+            ];
+            $transaction->create($transaction_arr);
+            DB::commit();
+
+            return $this->sendResponse([], 'Withdraw successful.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->sendError($e->getMessage(), [], 500);
+        }
+    }
+
+    public function transfer(Request $request)
+    {
+        $this->validate($request, [
+            'amount' => 'required|numeric|min:0.01',
+            'from_account_id' => 'required|exists:accounts,id',
+            'to_account_id' => 'required|exists:accounts,id|different:from_account_id',
+        ]);
+
+        try {
+            DB::beginTransaction();
+            $from_account = Account::find($request->from_account_id);
+            $to_account = Account::find($request->to_account_id);
+
+            $from_account->balance -= $request->amount;
+            $from_account->save();
+
+            $to_account->balance += $request->amount;
+            $to_account->save();
+    
+            $transaction = new Transactions;
+            $transaction_arr = [
+                'transaction_type' => 'transfer',
+                'amount' => $request->amount,
+                'account_id' => $request->from_account_id,
+                'user_id' => auth()->id(),
+                'description' => $request->description ?? 'Transfer transaction',
+                'related_account_id' => $request->to_account_id,
+            ];
+            $transaction->create($transaction_arr);
+            DB::commit();
+
+            return $this->sendResponse([], 'Transfer successful.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->sendError($e->getMessage(), [], 500);
+        }
     }
 }
