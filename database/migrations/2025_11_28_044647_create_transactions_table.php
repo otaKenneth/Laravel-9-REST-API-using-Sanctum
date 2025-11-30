@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('transactions', function (Blueprint $table) {
+        Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id')->unsigned();
-            $table->integer('account_id')->unsigned();
-            $table->decimal('amount', 15, 2);
-            $table->string('transaction_type'); // e.g., 'deposit', 'withdrawal'
-            $table->string('description')->nullable();
+            $table->decimal('total_amount', 15, 2);
+            $table->string('status'); // e.g., 'pending', 'completed'
             $table->timestamps();
         });
     }

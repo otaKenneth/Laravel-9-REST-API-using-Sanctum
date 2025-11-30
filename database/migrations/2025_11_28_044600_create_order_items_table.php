@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('accounts', function (Blueprint $table) {
+        Schema::create('order_items', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->unsigned();
-            $table->string('account_number')->unique();
-            $table->decimal('balance', 15, 2)->default(0);
+            $table->integer('order_id')->unsigned();
+            $table->integer('product_id')->unsigned();
+            $table->integer('quantity')->default(1);
+            $table->decimal('price', 15, 2);
             $table->timestamps();
         });
     }
