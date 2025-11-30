@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('payment_method_id')->unsigned();
             $table->decimal('amount', 10, 2);
             $table->string('status');
+            $table->string('transaction_number')->unique();
             $table->timestamps();
         });
     }
