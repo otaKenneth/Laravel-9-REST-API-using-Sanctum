@@ -41,4 +41,13 @@ class UserFactory extends Factory
             ];
         });
     }
+
+    public function configurePaymentMethods(int $count = 1)
+    {
+        return $this->afterCreating(function (\App\Models\User $user) use ($count) {
+            \App\Models\UserPaymentMethod::factory()->count($count)->create([
+                'user_id' => $user->id,
+            ]);
+        });
+    }
 }
