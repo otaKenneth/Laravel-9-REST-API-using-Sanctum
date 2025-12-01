@@ -30,4 +30,11 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'bank' => [
+        'domain' => env('BANK_API_URL'),
+        'key' => env('BANK_ACCESS_KEY_ID'),
+        'secret' => env('BANK_SECRET_ACCESS_KEY'),
+        'my_account' => env('BANK_ACCOUNT_NUMBER')
+    ]
+
 ];

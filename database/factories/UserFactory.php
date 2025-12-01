@@ -24,7 +24,8 @@ class UserFactory extends Factory
             'name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi' // password
+            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+            'role' => $this->faker->randomElement(['admin', 'customer']),
         ];
     }
 
@@ -42,7 +43,7 @@ class UserFactory extends Factory
         });
     }
 
-    public function configurePaymentMethods(int $count = 1)
+    public function configure(int $count = 1)
     {
         return $this->afterCreating(function (\App\Models\User $user) use ($count) {
             \App\Models\UserPaymentMethod::factory()->count($count)->create([

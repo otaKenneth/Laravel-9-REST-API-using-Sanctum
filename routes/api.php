@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\RegisterController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\TransactionController;
-use App\Http\Controllers\API\TreeController;
+use App\Http\Controllers\API\OrdersController;
+use App\Http\Controllers\API\AppRegisterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +32,14 @@ Route::controller(RegisterController::class)->group(function(){
 });
      
 Route::middleware('auth:sanctum')->group( function () {
-    Route::resource('users', UsersController::class);
-    Route::resource('transactions', TransactionController::class);
+    Route::middleware('role:admin')->group(function () {
+        Route::resource('users', UsersController::class);
+        Route::post('app-register', [AppRegisterController::class, 'store']);
+        Route::patch('order/{order}', [OrdersController::class, 'updateStatus']);
+    });
+    
+    Route::middleware('role:customer')->group(function () {
+        Route::post('order', [OrdersController::class, 'store']);
+        Route::put('order/{order}/pay', [OrdersController::class, 'update']);
+    });
 });

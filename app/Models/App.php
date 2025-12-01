@@ -5,15 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Payment extends Model
+class App extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'payment_method_id',
-        'amount',
-        'status',
-        'transaction_number'
+        'name', 'secret', 'api_key', 'url'
     ];
 }
