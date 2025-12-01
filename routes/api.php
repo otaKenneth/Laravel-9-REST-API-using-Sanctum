@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\RegisterController;
 use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\API\DepositController;
+use App\Http\Controllers\API\AppsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,7 +36,7 @@ Route::middleware('auth:sanctum')->group( function () {
         Route::post('deposit', [DepositController::class, 'store']);
         Route::post('withdraw', [TransactionController::class, 'withdraw']);
         Route::post('transfer', [TransactionController::class, 'transfer']);
-        Route::post('app/register', [AppsController::class, 'registerApp']);
+        Route::post('app-register', [AppsController::class, 'store']);
         Route::get('app/{app}/key', [AppsController::class, 'getAppKey']);
     });
 
@@ -44,3 +45,5 @@ Route::middleware('auth:sanctum')->group( function () {
     });
 
 });
+
+Route::middleware('verify.app')->post('payment', [TransactionController::class, 'payment']);

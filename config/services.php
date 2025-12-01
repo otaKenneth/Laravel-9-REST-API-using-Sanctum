@@ -30,4 +30,9 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'business' => [
+        'key' => env('BUSINESS_ACCESS_KEY_ID'),
+        'secret' => env('BUSINESS_SECRET_ACCESS_KEY')
+    ]
+
 ];

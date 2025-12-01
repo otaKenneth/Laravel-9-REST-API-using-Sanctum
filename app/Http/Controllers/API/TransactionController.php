@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Account;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Validator;
 
 class TransactionController extends BaseController
 {
@@ -107,11 +108,16 @@ class TransactionController extends BaseController
 
     public function transfer(Request $request)
     {
-        $this->validate($request, [
+        $input = $request->all();
+        $validator = Validator::make($input, [
             'amount' => 'required|numeric|min:0.01',
             'from_account_id' => 'required|exists:accounts,id',
             'to_account_id' => 'required|exists:accounts,id|different:from_account_id',
         ]);
+
+        if ($validator->fails()){
+            return $this->sendError('Validation Error.', $validator->errors(), 400);
+        }
 
         try {
             DB::beginTransaction();
@@ -137,6 +143,49 @@ class TransactionController extends BaseController
             DB::commit();
 
             return $this->sendResponse([], 'Transfer successful.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->sendError($e->getMessage(), [], 500);
+        }
+    }
+
+    public function payment (Request $request)
+    {
+        $input = $request->all();
+        $validator = Validator::make($input, [
+            'amount' => 'required|numeric|min:0.01',
+            'from_account_number' => 'required|exists:accounts,account_number',
+            'to_account_number' => 'required|exists:accounts,account_number|different:from_account_number',
+        ]);
+
+        if ($validator->fails()){
+            return $this->sendError('Validation Error.', $validator->errors(), 400);
+        }
+
+        try {
+            DB::beginTransaction();
+            $from_account = Account::where('account_number', $request->from_account_number)->first();
+            $to_account = Account::where('account_number', $request->to_account_number)->first();
+
+            $from_account->balance -= $request->amount;
+            $from_account->save();
+
+            $to_account->balance += $request->amount;
+            $to_account->save();
+    
+            $transaction = new Transactions;
+            $transaction_arr = [
+                'transaction_type' => 'payment',
+                'amount' => $request->amount,
+                'account_id' => $from_account->id,
+                'user_id' => $from_account->user_id,
+                'description' => $request->description ?? 'Payment transaction',
+                'related_account_id' => $to_account->id,
+            ];
+            $transaction->create($transaction_arr);
+            DB::commit();
+
+            return $this->sendResponse([], 'Payment successful.');
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->sendError($e->getMessage(), [], 500);
