@@ -67,6 +67,7 @@ class OrdersController extends BaseController
             ];
             
             $response = Http::withHeaders([
+                'Origin' => config('app.url'),
                 'X-API-KEY' => $service_config['key'],
                 'X-SECRET-KEY' => $service_config['secret'],
                 'Content-Type' => 'application/json'
